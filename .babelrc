@@ -1,0 +1,14 @@
+{
+	"env": {
+		"cjs": {
+			"presets": [["es2015", { "loose": true }], "stage-3"]
+		},
+		"es": {
+			"presets": [["es2015", { "loose": true, "modules": false }], "stage-3"]
+		},
+		"test": {
+			"presets": ["es2015", "stage-3"]
+		}
+	},
+	"plugins": ["transform-runtime"]
+}
