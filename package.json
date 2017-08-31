@@ -7,6 +7,7 @@
 	"repository": "https://github.com/ChaosGroup/redux-saga-first-router",
 	"author": "ChaosGroup (c) 2013-2017",
 	"license": "MIT",
+	"keywords": ["react", "redux", "redux-saga", "router"],
 	"files": ["src", "lib"],
 	"devDependencies": {
 		"babel-cli": "^6.24.1",
