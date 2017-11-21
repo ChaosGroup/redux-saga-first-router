@@ -1,14 +1,22 @@
 {
 	"name": "redux-saga-first-router",
-	"version": "0.0.12",
+	"version": "0.0.13",
 	"description": "'Saga First' Router for React/Redux/Saga Projects",
 	"main": "lib/index.js",
 	"module": "lib/es/index.js",
 	"repository": "https://github.com/ChaosGroup/redux-saga-first-router",
 	"author": "ChaosGroup (c) 2013-2017",
 	"license": "MIT",
-	"keywords": ["react", "redux", "redux-saga", "router"],
-	"files": ["src", "lib"],
+	"keywords": [
+		"react",
+		"redux",
+		"redux-saga",
+		"router"
+	],
+	"files": [
+		"src",
+		"lib"
+	],
 	"devDependencies": {
 		"babel-cli": "^6.24.1",
 		"babel-core": "^6.25.0",
@@ -39,11 +47,12 @@
 		"eslint": "eslint src",
 		"test": "jest",
 		"test-dev": "jest --watchAll",
-		"prettier":
-			"prettier --print-width 100 --tab-width 4 --use-tabs true --single-quote true --trailing-comma es5 --write \"src/**/*.js\""
+		"prettier": "prettier --print-width 100 --tab-width 4 --use-tabs true --single-quote true --trailing-comma es5 --write \"src/**/*.js\""
 	},
 	"jest": {
 		"moduleNameMapper": {},
-		"roots": ["<rootDir>/src/"]
+		"roots": [
+			"<rootDir>/src/"
+		]
 	}
 }
