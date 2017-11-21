@@ -1,5 +1,5 @@
 import { eventChannel, buffers } from 'redux-saga';
-import { take, put, all, call, takeLatest, fork } from 'redux-saga/effects';
+import { take, put, call, takeLatest, fork } from 'redux-saga/effects';
 import pathToRegexp from 'path-to-regexp';
 
 export const NAVIGATE = 'router/NAVIGATE';
@@ -126,11 +126,11 @@ export function* storeToHistory(routesMap, history) {
 }
 
 export function* saga(routesMap, history) {
-	const historyChannel = yield call(createHistoryChannel, history);
+	// register NAVIGATE listeners
+	yield fork(routeSaga, routesMap);
+	yield fork(storeToHistory, routesMap, history);
 
-	yield all([
-		call(routeSaga, routesMap),
-		call(historyToStore, routesMap, historyChannel),
-		call(storeToHistory, routesMap, history),
-	]);
+	// init NAVIGATE emitter
+	const historyChannel = yield call(createHistoryChannel, history);
+	yield fork(historyToStore, routesMap, historyChannel);
 }
