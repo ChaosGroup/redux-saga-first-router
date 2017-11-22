@@ -47,7 +47,7 @@
 		"eslint": "eslint src",
 		"test": "jest",
 		"test-dev": "jest --watchAll",
-		"prettier": "prettier --print-width 100 --tab-width 4 --use-tabs true --single-quote true --trailing-comma es5 --write \"src/**/*.js\""
+		"prettier": "prettier --write \"src/**/*.js\""
 	},
 	"jest": {
 		"moduleNameMapper": {},
