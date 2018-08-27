@@ -37,6 +37,7 @@
 		"babel-runtime": "^6.26.0",
 		"history": "^4.6.3",
 		"path-to-regexp": "^1.7.0",
+		"query-string": "^6.1.0",
 		"redux-saga": "^0.15.6"
 	},
 	"scripts": {

@@ -1,6 +1,7 @@
 import { eventChannel, buffers } from 'redux-saga';
 import { take, put, call, takeLatest, fork } from 'redux-saga/effects';
 import pathToRegexp from 'path-to-regexp';
+import queryString from 'query-string';
 
 export const NAVIGATE = 'router/NAVIGATE';
 
@@ -25,8 +26,8 @@ export function buildRoutesMap(...routes) {
 
 const initialState = {
 	id: null,
-	path: null,
 	params: null,
+	query: null,
 	prev: null,
 };
 
@@ -35,7 +36,7 @@ export function reducer(state = initialState, action) {
 		return {
 			id: action.id,
 			params: action.params,
-			path: action.path || null,
+			query: action.query,
 			prev: state.id && {
 				...state,
 				prev: null,
@@ -47,13 +48,16 @@ export function reducer(state = initialState, action) {
 
 export function actionToPath(routesMap, action) {
 	const route = routesMap.get(action && action.id) || null;
-	return route && route.toPath(action.params);
+	const path = route && route.toPath(action.params);
+	return path && ((action.query && `${path}?${queryString.stringify(action.query)}`) || path);
 }
 
-export function pathToAction(routesMap, path, state = {}) {
+export function pathToAction(routesMap, path, search, state = {}) {
 	if (!path || typeof path !== 'string') {
 		return null;
 	}
+
+	const query = search && queryString.parse(search);
 
 	for (const [id, route] of routesMap.entries()) {
 		const captures = path.match(route.re);
@@ -70,7 +74,7 @@ export function pathToAction(routesMap, path, state = {}) {
 			return params;
 		}, {});
 
-		return navigate(id, { ...params, ...state });
+		return navigate(id, { ...params, ...state }, { query });
 	}
 
 	return navigate('NOT_FOUND');
@@ -90,10 +94,10 @@ export function createHistoryChannel(history) {
 	}, buffers.fixed());
 }
 
-export function* onNavigate(routesMap, { id, params }) {
+export function* onNavigate(routesMap, { id, params, query }) {
 	const r = routesMap.get(id);
 	if (r && r.saga) {
-		yield fork(r.saga, params);
+		yield fork(r.saga, params, query);
 	}
 }
 
@@ -105,7 +109,12 @@ export function* historyToStore(routesMap, historyChannel) {
 	while (true) {
 		const { location, action } = yield take(historyChannel);
 		if (!action || action === 'POP') {
-			const navigateAction = pathToAction(routesMap, location.pathname, location.state);
+			const navigateAction = pathToAction(
+				routesMap,
+				location.pathname,
+				location.search,
+				location.state
+			);
 			yield put(navigateAction);
 		}
 	}
@@ -115,7 +124,11 @@ export function* storeToHistory(routesMap, history) {
 	while (true) {
 		const navigateAction = yield take(NAVIGATE);
 		const navigatePath = actionToPath(routesMap, navigateAction);
-		const currentAction = pathToAction(routesMap, history.location.pathname);
+		const currentAction = pathToAction(
+			routesMap,
+			history.location.pathname,
+			history.location.search
+		);
 		const currentPath = actionToPath(routesMap, currentAction); // normalized
 		if (navigatePath && navigatePath !== currentPath) {
 			history[navigateAction.replace ? 'replace' : 'push'](navigatePath, {

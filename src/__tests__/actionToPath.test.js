@@ -24,6 +24,15 @@ describe('actionToPath', () => {
 		}).toThrow();
 	});
 
+	test('defined route, with params and query', () => {
+		expect(
+			actionToPath(
+				routesMap,
+				navigate('PROJECT', { projectName: 'Project 123' }, { query: { returnTo: 'home' } })
+			)
+		).toBe('/portal/projects/Project%20123?returnTo=home');
+	});
+
 	test('undefined route', () => {
 		expect(actionToPath(routesMap, navigate('UNDEFINED'))).toBe(null);
 	});

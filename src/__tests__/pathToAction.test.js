@@ -17,9 +17,23 @@ describe('pathToAction', () => {
 		);
 	});
 
+	test('defined route, with params, with search', () => {
+		expect(pathToAction(routesMap, '/portal/projects/Project123', '?returnTo=home')).toEqual(
+			navigate('PROJECT', { projectName: 'Project123' }, { query: { returnTo: 'home' } })
+		);
+	});
+
 	test('defined route, with params, with state', () => {
-		expect(pathToAction(routesMap, '/portal/projects/Project123', { custom: 123 })).toEqual(
-			navigate('PROJECT', { projectName: 'Project123', custom: 123 })
+		expect(
+			pathToAction(routesMap, '/portal/projects/Project123', '?returnTo=home', {
+				custom: 123,
+			})
+		).toEqual(
+			navigate(
+				'PROJECT',
+				{ projectName: 'Project123', custom: 123 },
+				{ query: { returnTo: 'home' } }
+			)
 		);
 	});
 
