@@ -24,10 +24,14 @@ const routesMap = buildRoutesMap(
 
 describe('onNavigate', () => {
 	test('should start defined route saga ', () => {
-		const action = navigate('PROJECT', { projectName: 'Project 123' });
+		const action = navigate(
+			'PROJECT',
+			{ projectName: 'Project 123' },
+			{ query: { returnTo: 'home' } }
+		);
 		const gen = onNavigate(routesMap, action);
 
-		expect(gen.next().value).toEqual(fork(projectNavigate, action.params));
+		expect(gen.next().value).toEqual(fork(projectNavigate, action.params, action.query));
 		expect(gen.next().done).toBe(true);
 	});
 
@@ -52,10 +56,14 @@ describe('historyToStore', () => {
 		// when POP location received dispatch navigate
 		expect(
 			gen.next({
-				location: { pathname: '/portal/projects/Project%20123' },
+				location: { pathname: '/portal/projects/Project%20123', search: '?returnTo=home' },
 				action: 'POP',
 			}).value
-		).toEqual(put(navigate('PROJECT', { projectName: 'Project 123' })));
+		).toEqual(
+			put(
+				navigate('PROJECT', { projectName: 'Project 123' }, { query: { returnTo: 'home' } })
+			)
+		);
 
 		// wait for more
 		expect(gen.next().value).toEqual(take(historyChannel));
@@ -73,7 +81,7 @@ describe('historyToStore', () => {
 		// when not-POP location received wait for more
 		expect(
 			gen.next({
-				location: { pathname: '/portal/projects/Project%20123' },
+				location: { pathname: '/portal/projects/Project%20123', search: '?returnTo=home' },
 				action: 'PUSH',
 			}).value
 		).toEqual(take(historyChannel));
@@ -90,14 +98,16 @@ describe('storeToHistory', () => {
 		expect(gen.next().value).toEqual(take(NAVIGATE));
 
 		// when received, update history and wait for more
-		expect(gen.next(navigate('PROJECT', { projectName: 'Project 123' })).value).toEqual(
-			take(NAVIGATE)
-		);
+		expect(
+			gen.next(
+				navigate('PROJECT', { projectName: 'Project 123' }, { query: { returnTo: 'home' } })
+			).value
+		).toEqual(take(NAVIGATE));
 
 		// history updated with PUSH
 		expect(history).toMatchObject({
 			// ? memory history removes URL encoding
-			location: { pathname: '/portal/projects/Project 123' },
+			location: { pathname: '/portal/projects/Project 123', search: '?returnTo=home' },
 			action: 'PUSH',
 			length: 2,
 		});
