@@ -4,8 +4,8 @@ describe('reducer', () => {
 	test('should return the initial state', () => {
 		expect(reducer(undefined, {})).toEqual({
 			id: null,
-			path: null,
 			params: null,
+			query: null,
 			prev: null,
 		});
 	});
@@ -13,16 +13,20 @@ describe('reducer', () => {
 	test('should handle NAVIGATE', () => {
 		const state = {
 			id: null,
-			path: null,
 			params: null,
+			query: null,
 			prev: null,
 		};
-		const action = navigate('PROJECT', { projectName: 'Project 123' });
+		const action = navigate(
+			'PROJECT',
+			{ projectName: 'Project 123' },
+			{ query: { returnTo: 'home' } }
+		);
 
 		expect(reducer(state, action)).toEqual({
 			id: 'PROJECT',
-			path: null,
 			params: { projectName: 'Project 123' },
+			query: { returnTo: 'home' },
 			prev: null,
 		});
 	});
@@ -30,20 +34,24 @@ describe('reducer', () => {
 	test('should handle NAVIGATE and store previous route', () => {
 		const state = {
 			id: 'PROJECTS',
-			path: null,
 			params: {},
+			query: null,
 			prev: null,
 		};
-		const action = navigate('PROJECT', { projectName: 'Project 123' });
+		const action = navigate(
+			'PROJECT',
+			{ projectName: 'Project 123' },
+			{ query: { returnTo: 'home' } }
+		);
 
 		expect(reducer(state, action)).toEqual({
 			id: 'PROJECT',
-			path: null,
 			params: { projectName: 'Project 123' },
+			query: { returnTo: 'home' },
 			prev: {
 				id: 'PROJECTS',
-				path: null,
 				params: {},
+				query: null,
 				prev: null,
 			},
 		});
@@ -52,8 +60,8 @@ describe('reducer', () => {
 	test('should ignore UNKNOWN actions', () => {
 		const state = {
 			id: 'PROJECTS',
-			path: null,
 			params: {},
+			query: null,
 			prev: null,
 		};
 
