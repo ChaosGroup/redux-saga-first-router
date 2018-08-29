@@ -1,7 +1,6 @@
 import { eventChannel, buffers } from 'redux-saga';
 import { take, put, call, takeLatest, fork } from 'redux-saga/effects';
 import pathToRegexp from 'path-to-regexp';
-import queryString from 'query-string';
 
 export const NAVIGATE = 'router/NAVIGATE';
 
@@ -46,10 +45,42 @@ export function reducer(state = initialState, action) {
 	return state;
 }
 
+export function queryStringify(query) {
+	const encode = input => encodeURIComponent(input);
+	query = query || {};
+	return Object.keys(query)
+		.sort()
+		.filter(key => query[key] !== undefined)
+		.map(key => {
+			return [key]
+				.concat(query[key] !== null ? [query[key]] : [])
+				.map(encode)
+				.join('=');
+		})
+		.join('&');
+}
+
+export function queryParse(query) {
+	const decode = input => decodeURIComponent(input.replace(/\+/g, ' '));
+	const parser = /([^=?&]+)=?([^&]*)/g;
+
+	const result = Object.create(null);
+
+	let part;
+	while ((part = parser.exec(query))) {
+		const all = decode(part[0])
+		const key = decode(part[1]);
+		const value = all === key ? null : decode(part[2]);
+		result[key] = key in result ? [].concat(result[key], value) : value;
+	}
+
+	return result;
+}
+
 export function actionToPath(routesMap, action) {
 	const route = routesMap.get(action && action.id) || null;
 	const path = route && route.toPath(action.params);
-	return path && ((action.query && `${path}?${queryString.stringify(action.query)}`) || path);
+	return path && ((action.query && `${path}?${queryStringify(action.query)}`) || path);
 }
 
 export function pathToAction(routesMap, path, search, state = {}) {
@@ -57,7 +88,7 @@ export function pathToAction(routesMap, path, search, state = {}) {
 		return null;
 	}
 
-	const query = search && queryString.parse(search);
+	const query = search && queryParse(search);
 
 	for (const [id, route] of routesMap.entries()) {
 		const captures = path.match(route.re);
