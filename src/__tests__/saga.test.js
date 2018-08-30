@@ -1,4 +1,4 @@
-import { take, put, fork } from 'redux-saga/effects';
+import { take, put } from 'redux-saga/effects';
 import createHistory from 'history/createMemoryHistory';
 
 import {
@@ -7,7 +7,6 @@ import {
 	buildRoutesMap,
 	route,
 	createHistoryChannel,
-	onNavigate,
 	historyToStore,
 	storeToHistory,
 } from '../index';
@@ -22,25 +21,8 @@ const routesMap = buildRoutesMap(
 	route('DOWNLOAD', '/portal/download')
 );
 
-describe('onNavigate', () => {
-	test('should start defined route saga ', () => {
-		const action = navigate(
-			'PROJECT',
-			{ projectName: 'Project 123' },
-			{ query: { returnTo: 'home' } }
-		);
-		const gen = onNavigate(routesMap, action);
-
-		expect(gen.next().value).toEqual(fork(projectNavigate, action.params, action.query));
-		expect(gen.next().done).toBe(true);
-	});
-
-	test('should exit when no route saga is defined', () => {
-		const action = navigate('DOWNLOAD');
-		const gen = onNavigate(routesMap, action);
-
-		expect(gen.next().done).toBe(true);
-	});
+describe('routeSaga', () => {
+	//TODO: !!
 });
 
 describe('historyToStore', () => {

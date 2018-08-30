@@ -1,5 +1,5 @@
 import { eventChannel, buffers } from 'redux-saga';
-import { take, put, call, takeLatest, fork } from 'redux-saga/effects';
+import { take, put, call, fork, cancel } from 'redux-saga/effects';
 import pathToRegexp from 'path-to-regexp';
 
 export const NAVIGATE = 'router/NAVIGATE';
@@ -8,17 +8,18 @@ export function navigate(id, params = {}, opts = {}) {
 	return { type: NAVIGATE, id, params, ...opts };
 }
 
-export function route(id, path, saga) {
-	return { id, path, saga };
+export function route(id, path, navigateSaga, querySaga) {
+	return { id, path, navigateSaga, querySaga };
 }
 
 export function buildRoutesMap(...routes) {
 	return new Map(
-		routes.map(({ id, path, saga }) => {
+		routes.map(route => {
+			const { id, path } = route;
 			const keys = [];
 			const re = pathToRegexp(path, keys);
 			const toPath = pathToRegexp.compile(path);
-			return [id, { id, path, saga, re, keys, toPath }];
+			return [id, { ...route, re, keys, toPath }];
 		})
 	);
 }
@@ -45,6 +46,78 @@ export function reducer(state = initialState, action) {
 	return state;
 }
 
+// epoberezkin/fast-deep-equal
+export function equal(a, b) {
+	if (a === b) {
+		return true;
+	}
+
+	// is NaN
+	// eslint-disable-next-line no-self-compare
+	if (a !== a && b !== b) {
+		return true;
+	}
+
+	if (a && b && typeof a === 'object' && typeof b === 'object') {
+		const arrA = Array.isArray(a);
+		const arrB = Array.isArray(b);
+
+		if (arrA && arrB) {
+			if (a.length !== b.length) return false;
+			for (let i = a.length; i-- !== 0; ) {
+				if (!equal(a[i], b[i])) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		if (arrA !== arrB) {
+			return false;
+		}
+
+		const dateA = a instanceof Date;
+		const dateB = b instanceof Date;
+		if (dateA !== dateB) {
+			return false;
+		}
+		if (dateA && dateB) {
+			return a.getTime() === b.getTime();
+		}
+
+		const regexpA = a instanceof RegExp;
+		const regexpB = b instanceof RegExp;
+		if (regexpA !== regexpB) {
+			return false;
+		}
+		if (regexpA && regexpB) {
+			return a.toString() === b.toString();
+		}
+
+		const keys = Object.keys(a);
+		if (keys.length !== Object.keys(b).length) {
+			return false;
+		}
+
+		for (let i = keys.length; i-- !== 0; ) {
+			if (!Object.prototype.hasOwnProperty.call(b, keys[i])) {
+				return false;
+			}
+		}
+
+		for (let i = keys.length; i-- !== 0; ) {
+			let key = keys[i];
+			if (!equal(a[key], b[key])) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 export function queryStringify(query) {
 	const encode = input => encodeURIComponent(input);
 	query = query || {};
@@ -68,7 +141,7 @@ export function queryParse(query) {
 
 	let part;
 	while ((part = parser.exec(query))) {
-		const all = decode(part[0])
+		const all = decode(part[0]);
 		const key = decode(part[1]);
 		const value = all === key ? null : decode(part[2]);
 		result[key] = key in result ? [].concat(result[key], value) : value;
@@ -80,11 +153,13 @@ export function queryParse(query) {
 export function actionToPath(routesMap, action) {
 	const route = routesMap.get(action && action.id) || null;
 	const path = route && route.toPath(action.params);
-	return path && ((action.query && `${path}?${queryStringify(action.query)}`) || path);
+	const query = action && action.query && queryStringify(action.query);
+	const parts = path && [path].concat(query || []);
+	return parts && parts.join('?');
 }
 
 export function pathToAction(routesMap, path, search, state = {}) {
-	if (!path || typeof path !== 'string') {
+	if (typeof path !== 'string') {
 		return null;
 	}
 
@@ -125,46 +200,90 @@ export function createHistoryChannel(history) {
 	}, buffers.fixed());
 }
 
-export function* onNavigate(routesMap, { id, params, query }) {
-	const r = routesMap.get(id);
-	if (r && r.saga) {
-		yield fork(r.saga, params, query);
-	}
-}
-
 export function* routeSaga(routesMap) {
-	yield takeLatest(NAVIGATE, onNavigate, routesMap);
+	let currentAction;
+	let currentNavigateTask;
+	let currentQueryTask;
+
+	function* cancelCurrentNavigateTask() {
+		if (currentNavigateTask) {
+			yield cancel(currentNavigateTask);
+			currentNavigateTask = null;
+		}
+	}
+	function* forkNavigateTask(route, params, query) {
+		if (route && route.navigateSaga) {
+			currentNavigateTask = yield fork(route.navigateSaga, params, query);
+		}
+	}
+	function* cancelCurrentQueryTask() {
+		if (currentQueryTask) {
+			yield cancel(currentQueryTask);
+			currentQueryTask = null;
+		}
+	}
+	function* forkQueryTask(route, params, query) {
+		if (route && route.querySaga) {
+			currentQueryTask = yield fork(route.querySaga, params, query);
+		}
+	}
+
+	while (true) {
+		const navigateAction = yield take(NAVIGATE);
+		const { id, params, query } = navigateAction;
+
+		const route = routesMap.get(id);
+
+		const sameRoute =
+			!navigateAction.force &&
+			currentAction &&
+			currentAction.id === id &&
+			equal(currentAction.params, params);
+		const queryChangeOnly = sameRoute && !equal(currentAction.query || null, query || null);
+
+		currentAction = { id, params, query };
+		if (!sameRoute) {
+			yield* cancelCurrentQueryTask();
+			yield* cancelCurrentNavigateTask();
+
+			yield* forkNavigateTask(route, params, query);
+		} else if (queryChangeOnly) {
+			yield* cancelCurrentQueryTask();
+
+			yield* forkQueryTask(route, params, query);
+		}
+	}
 }
 
 export function* historyToStore(routesMap, historyChannel) {
 	while (true) {
 		const { location, action } = yield take(historyChannel);
 		if (!action || action === 'POP') {
-			const navigateAction = pathToAction(
-				routesMap,
-				location.pathname,
-				location.search,
-				location.state
-			);
-			yield put(navigateAction);
+			const { pathname, search, state } = location;
+			const navigateAction = pathToAction(routesMap, pathname, search, state);
+			if (navigateAction) {
+				yield put(navigateAction);
+			}
 		}
 	}
 }
 
 export function* storeToHistory(routesMap, history) {
+	const { pathname, search } = history.location;
+	let currentAction = pathToAction(routesMap, pathname, search);
+
 	while (true) {
 		const navigateAction = yield take(NAVIGATE);
-		const navigatePath = actionToPath(routesMap, navigateAction);
-		const currentAction = pathToAction(
-			routesMap,
-			history.location.pathname,
-			history.location.search
-		);
-		const currentPath = actionToPath(routesMap, currentAction); // normalized
-		if (navigatePath && navigatePath !== currentPath) {
-			history[navigateAction.replace ? 'replace' : 'push'](navigatePath, {
-				...navigateAction.params,
-			});
+		const { id, params, query } = navigateAction;
+		const sameAction = equal(currentAction, { id, params, query });
+		if (!sameAction) {
+			currentAction = { id, params, query };
+			const navigatePath = actionToPath(routesMap, navigateAction);
+			if (navigatePath) {
+				history[navigateAction.replace ? 'replace' : 'push'](navigatePath, {
+					...navigateAction.params,
+				});
+			}
 		}
 	}
 }

@@ -3,7 +3,7 @@ import { buildRoutesMap, route } from '../index';
 describe('buildRoutesMap', () => {
 	const routes = [
 		route('JOB', '/portal/projects/:projectName/:jobId'),
-		route('PROJECT', '/portal/projects/:projectName'),
+		route('PROJECT', '/portal/projects/:projectName', function*() {}, function*() {}),
 		route('PROJECTS', '/portal/projects', function*() {}),
 		route('DOWNLOAD', '/portal/download'),
 	];
@@ -22,13 +22,17 @@ describe('buildRoutesMap', () => {
 		expect(projectRoute.keys).toBeInstanceOf(Array);
 		expect(projectRoute).toHaveProperty('toPath');
 		expect(projectRoute.toPath).toBeInstanceOf(Function);
-		expect(projectRoute).toHaveProperty('saga');
-		expect(projectRoute.saga).toBeUndefined();
+		expect(projectRoute).toHaveProperty('navigateSaga');
+		expect(projectRoute.navigateSaga).toBeInstanceOf(Function);
+		expect(projectRoute).toHaveProperty('querySaga');
+		expect(projectRoute.querySaga).toBeInstanceOf(Function);
 
 		const projectsRoute = routesMap.get('PROJECTS');
 		expect(projectsRoute).toBeDefined();
-		expect(projectsRoute).toHaveProperty('saga');
-		expect(projectsRoute.saga).toBeInstanceOf(Function);
+		expect(projectsRoute).toHaveProperty('navigateSaga');
+		expect(projectsRoute.navigateSaga).toBeInstanceOf(Function);
+		expect(projectsRoute).toHaveProperty('querySaga');
+		expect(projectsRoute.querySaga).toBeUndefined();
 
 		const keys = Array.from(routesMap.keys());
 		expect(keys).toEqual(['JOB', 'PROJECT', 'PROJECTS', 'DOWNLOAD']);

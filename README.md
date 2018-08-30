@@ -28,7 +28,7 @@ import {
 // provided sagas are activated/deactivated on matched route
 const routesMap = buildRoutesMap(
 	route('PROJECT', '/portal/projects/:projectName', projectNavigate),
-	route('PROJECTS', '/portal/projects', projectsNavigate),
+	route('PROJECTS', '/portal/projects', projectsNavigate, projectsQuery),
 	route('DOWNLOAD', '/portal/download')
 	// ...
 );
@@ -56,15 +56,17 @@ sagaMiddleware.run(routerSaga, routesMap, history);
 
 ```js
 {
-    id: 'PROJECT',
-    path: '/portal/projects/:projectName',
-    saga: projectNavigate
+    id: 'PROJECTS',
+    path: '/portal/projects',
+    navigateSaga: projectNavigate,
+    querySaga: projectsQuery
 }
 ```
 
 -   _`id: {string}`_ - should be unique and is part of all `dispatch`-ed `redux` actions.
 -   _`path: {string}`_ - Express-style path definition, for reference check [Path-to-RegExp](https://github.com/pillarjs/path-to-regexp) documentation (only paths are supported, no query strings).
--   _`saga: {function*}`_ - [optional] `saga` that will be `fork`-ed when navigated to matching route and `cancel`-ed when navigated away.
+-   _`navigateSaga: {function*}`_ - [optional] `saga` that will be `fork`-ed when navigated to matching route and `cancel`-ed when navigated away.
+-   _`querySaga: {function*}`_ - [optional] `saga` that will be `fork`-ed when query is changed.
 
 Routes are evaluated from top to bottom until URL match is found, this requires routes to be ordered from more to less specific.
 
@@ -103,7 +105,8 @@ const mapDispatchToProps = dispatch => {
 Where `navigate` is small action creator helper. The third parameter can be used to pass additional options, currently supported are:
 
 -   _`replace: {boolean}`_ - instructs the router to use `replace` instead of `push` method on history update.
--   _`query: {object}`_ - appends query string parameters to generated URL, these will be passed later as second parameter of activated navigate saga.
+-   _`force: {boolean}`_ - instructs the router to force new saga fork even if navigate action is the same as current route.
+-   _`query: {object}`_ - appends query string parameters to generated URL, these will be passed later as second parameter of activated navigate & query saga.
 
 Query string parameters are unordered/arbitrary data, they are always optional and not considered in route matching.
 
