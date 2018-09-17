@@ -134,6 +134,10 @@ export function queryStringify(query) {
 }
 
 export function queryParse(query) {
+	if (typeof query !== 'string' || !query.length) {
+		return null;
+	}
+
 	const decode = input => decodeURIComponent(input.replace(/\+/g, ' '));
 	const parser = /([^=?&]+)=?([^&]*)/g;
 
@@ -163,7 +167,8 @@ export function pathToAction(routesMap, path, search, state = {}) {
 		return null;
 	}
 
-	const query = search && queryParse(search);
+	const query = queryParse(search);
+	const opts = query && { query };
 
 	for (const [id, route] of routesMap.entries()) {
 		const captures = path.match(route.re);
@@ -180,7 +185,7 @@ export function pathToAction(routesMap, path, search, state = {}) {
 			return params;
 		}, {});
 
-		return navigate(id, { ...params, ...state }, { query });
+		return navigate(id, { ...params, ...state }, opts);
 	}
 
 	return navigate('NOT_FOUND');

@@ -23,6 +23,12 @@ describe('pathToAction', () => {
 		);
 	});
 
+	test('defined route, with params, without search', () => {
+		expect(pathToAction(routesMap, '/portal/projects/Project123', '')).toEqual(
+			navigate('PROJECT', { projectName: 'Project123' })
+		);
+	});
+
 	test('defined route, with params, with state', () => {
 		expect(
 			pathToAction(routesMap, '/portal/projects/Project123', '?returnTo=home', {
