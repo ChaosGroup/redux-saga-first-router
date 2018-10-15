@@ -154,6 +154,10 @@ export function queryParse(query) {
 	return result;
 }
 
+function actionMask({ id, params, query = null } = {}) {
+	return { id, params, query };
+}
+
 export function actionToPath(routesMap, action) {
 	const route = routesMap.get(action && action.id) || null;
 	const path = route && route.toPath(action.params);
@@ -238,27 +242,40 @@ export function* routeSaga(routesMap) {
 		const { id, params, query } = navigateAction;
 
 		const route = routesMap.get(id);
+		if (!route) {
+			continue;
+		}
+
+		const newAction = actionMask(navigateAction);
 
 		const sameRoute =
 			!navigateAction.force &&
-			currentAction &&
+			!!currentAction &&
 			currentAction.id === id &&
 			equal(currentAction.params, params);
-		const queryChangeOnly = sameRoute && !equal(currentAction.query || null, query || null);
 
-		currentAction = { id, params, query };
+		const queryChangeOnly = sameRoute && !equal(currentAction.query, query || null);
+
+		currentAction = newAction;
+
 		if (!sameRoute) {
 			yield* cancelCurrentQueryTask();
 			yield* cancelCurrentNavigateTask();
 
 			yield* forkNavigateTask(route, params, query);
-		} else if (queryChangeOnly) {
+			continue;
+		}
+
+		if (queryChangeOnly) {
 			yield* cancelCurrentQueryTask();
 
 			yield* forkQueryTask(route, params, query);
+			continue;
 		}
 	}
 }
+
+const HISTORY_STAMP = Symbol();
 
 export function* historyToStore(routesMap, historyChannel) {
 	while (true) {
@@ -267,6 +284,7 @@ export function* historyToStore(routesMap, historyChannel) {
 			const { pathname, search, state } = location;
 			const navigateAction = pathToAction(routesMap, pathname, search, state);
 			if (navigateAction) {
+				navigateAction[HISTORY_STAMP] = true;
 				yield put(navigateAction);
 			}
 		}
@@ -274,20 +292,20 @@ export function* historyToStore(routesMap, historyChannel) {
 }
 
 export function* storeToHistory(routesMap, history) {
-	const { pathname, search } = history.location;
-	let currentAction = pathToAction(routesMap, pathname, search);
+	let currentAction;
 
 	while (true) {
 		const navigateAction = yield take(NAVIGATE);
-		const { id, params, query } = navigateAction;
-		const sameAction = equal(currentAction, { id, params, query });
-		if (!sameAction) {
-			currentAction = { id, params, query };
-			const navigatePath = actionToPath(routesMap, navigateAction);
-			if (navigatePath) {
-				history[navigateAction.replace ? 'replace' : 'push'](navigatePath, {
-					...navigateAction.params,
-				});
+		const newAction = actionMask(navigateAction);
+		if (!currentAction || !equal(currentAction, newAction)) {
+			currentAction = newAction;
+			if (!navigateAction[HISTORY_STAMP]) {
+				const navigatePath = actionToPath(routesMap, navigateAction);
+				if (navigatePath) {
+					history[navigateAction.replace ? 'replace' : 'push'](navigatePath, {
+						...navigateAction.params,
+					});
+				}
 			}
 		}
 	}
