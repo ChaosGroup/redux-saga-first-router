@@ -209,6 +209,8 @@ export function createHistoryChannel(history) {
 	}, buffers.fixed());
 }
 
+const HISTORY_STAMP = Symbol();
+
 export function* routeSaga(routesMap) {
 	let currentAction;
 	let currentNavigateTask;
@@ -266,7 +268,7 @@ export function* routeSaga(routesMap) {
 			continue;
 		}
 
-		if (queryChangeOnly) {
+		if (queryChangeOnly && navigateAction[HISTORY_STAMP]) {
 			yield* cancelCurrentQueryTask();
 
 			yield* forkQueryTask(route, params, query);
@@ -274,8 +276,6 @@ export function* routeSaga(routesMap) {
 		}
 	}
 }
-
-const HISTORY_STAMP = Symbol();
 
 export function* historyToStore(routesMap, historyChannel) {
 	while (true) {
