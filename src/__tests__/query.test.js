@@ -18,6 +18,16 @@ describe('queryStringify', () => {
 		expect(queryStringify({ foo: null })).toEqual('foo');
 		expect(queryStringify({ foo: undefined })).toEqual('');
 	});
+
+	describe('with array params', () => {
+		it('outputs correct URI Generic Syntax', () => {
+			expect(queryStringify({ foo: ['bar1', 'bar2'] })).toEqual('foo=bar1&foo=bar2');
+		});
+
+		it('outputs correct URI Generic Syntax with equal parameters', () => {
+			expect(queryStringify({ foo: ['bar1', 'bar1'] })).toEqual('foo=bar1');
+		});
+	});
 });
 
 describe('queryParse', () => {
