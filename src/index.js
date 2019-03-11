@@ -120,20 +120,21 @@ export function equal(a, b) {
 
 export function queryStringify(query) {
 	const encode = input => encodeURIComponent(input);
-  query = query || {};
+	query = query || {};
 	return Object.keys(query)
 		.sort()
 		.filter(key => query[key] !== undefined)
 		.map(key => {
-      return (Array.isArray(query[key]) ? query[key] : [query[key]])
-        .filter((value, index, arr) => arr.indexOf(value) === index)
-        .map(val => {
-          return [key]
-            .concat(val !== null ? [val] : [])
-            .map(encode)
-            .join('=');
-        })
-        .join('&');
+			const value = query[key];
+			return (Array.isArray(value) ? value : [value])
+				.filter((value, index, arr) => arr.indexOf(value) === index)
+				.map(value => {
+					return [key]
+						.concat(value !== null ? [value] : [])
+						.map(encode)
+						.join('=');
+				})
+				.join('&');
 		})
 		.join('&');
 }
