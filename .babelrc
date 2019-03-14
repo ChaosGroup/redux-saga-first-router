@@ -1,14 +1,14 @@
 {
 	"env": {
 		"cjs": {
-			"presets": [["es2015", { "loose": true }], "stage-3"]
+			"presets": [["@babel/preset-env", { "loose": true }]]
 		},
 		"es": {
-			"presets": [["es2015", { "loose": true, "modules": false }], "stage-3"]
+			"presets": [["@babel/preset-env", { "loose": true, "modules": false }]]
 		},
 		"test": {
-			"presets": ["es2015", "stage-3"]
+			"presets": ["@babel/preset-env"]
 		}
 	},
-	"plugins": ["transform-runtime"]
+	"plugins": ["@babel/plugin-transform-runtime"]
 }

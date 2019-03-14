@@ -215,7 +215,7 @@ export function createHistoryChannel(history) {
 	}, buffers.fixed());
 }
 
-const HISTORY_STAMP = Symbol();
+export const HISTORY_STAMP = Symbol();
 
 export function* routeSaga(routesMap) {
 	let currentAction;

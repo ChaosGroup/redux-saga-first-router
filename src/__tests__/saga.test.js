@@ -9,6 +9,7 @@ import {
 	createHistoryChannel,
 	historyToStore,
 	storeToHistory,
+	HISTORY_STAMP,
 } from '../index';
 
 const jobNavigate = function*() {};
@@ -42,9 +43,14 @@ describe('historyToStore', () => {
 				action: 'POP',
 			}).value
 		).toEqual(
-			put(
-				navigate('PROJECT', { projectName: 'Project 123' }, { query: { returnTo: 'home' } })
-			)
+			put({
+				...navigate(
+					'PROJECT',
+					{ projectName: 'Project 123' },
+					{ query: { returnTo: 'home' } }
+				),
+				[HISTORY_STAMP]: true,
+			})
 		);
 
 		// wait for more
