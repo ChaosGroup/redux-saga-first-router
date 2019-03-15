@@ -205,14 +205,14 @@ export function createHistoryChannel(history) {
 	return eventChannel(emitter => {
 		emitter({ location: history.location });
 
-		const ignore = history.listen((location, action) => {
+		const stop = history.listen((location, action) => {
 			emitter({ location, action });
 		});
 
 		return () => {
-			ignore();
+			stop();
 		};
-	}, buffers.fixed());
+	}, buffers.expanding());
 }
 
 export const HISTORY_STAMP = Symbol();
