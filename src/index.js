@@ -165,11 +165,15 @@ function actionMask({ id, params, query = null } = {}) {
 }
 
 export function actionToPath(routesMap, action) {
-	const route = routesMap.get(action && action.id) || null;
-	const path = route && route.toPath(action.params);
-	const query = action && action.query && queryStringify(action.query);
-	const parts = path && [path].concat(query || []);
-	return parts && parts.join('?');
+	const route = routesMap.get(action && action.id);
+	if (!route) {
+		return null;
+	}
+
+	const path = route.toPath(action.params);
+	const query = action.query && queryStringify(action.query);
+
+	return [path].concat(query || []).join('?');
 }
 
 export function pathToAction(routesMap, path, search, state = {}) {
