@@ -170,7 +170,7 @@ export function actionToPath(routesMap, action) {
 		return null;
 	}
 
-	const path = route.toPath(action.params);
+	const path = route.toPath(action.params) || '/';
 	const query = action.query && queryStringify(action.query);
 
 	return [path].concat(query || []).join('?');
@@ -311,7 +311,7 @@ export function* storeToHistory(routesMap, history) {
 			currentAction = newAction;
 			if (!navigateAction[HISTORY_STAMP]) {
 				const navigatePath = actionToPath(routesMap, navigateAction);
-				if (navigatePath) {
+				if (navigatePath !== null) {
 					history[navigateAction.replace ? 'replace' : 'push'](navigatePath, {
 						...navigateAction.params,
 					});
