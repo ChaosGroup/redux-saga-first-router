@@ -15,7 +15,7 @@ Keeping browser URL in sync with `redux` state and activating/deactivating appli
 Router `reducer` is registered as usual in `combineReducers` block. Router `saga` is our workhorse which is registered with `redux-saga` middleware after all other `saga`-s and is initialized with application `routesMap` and instance of `history` helper.
 
 ```js
-import createHistory from 'history/createBrowserHistory';
+import { createBrowserHistory } from 'history';
 import {
 	reducer as routerReducer,
 	saga as routerSaga,
@@ -33,7 +33,7 @@ const routesMap = buildRoutesMap(
 	// ...
 );
 
-const history = createHistory();
+const history = createBrowserHistory();
 
 const reducer = combineReducers({
 	// ... other reducers

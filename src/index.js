@@ -228,8 +228,9 @@ export function* routeSaga(routesMap) {
 
 	function* cancelCurrentNavigateTask() {
 		if (currentNavigateTask) {
-			yield cancel(currentNavigateTask);
+			const _t = currentNavigateTask;
 			currentNavigateTask = null;
+			yield cancel(_t);
 		}
 	}
 	function* forkNavigateTask(route, params, query) {
@@ -239,8 +240,9 @@ export function* routeSaga(routesMap) {
 	}
 	function* cancelCurrentQueryTask() {
 		if (currentQueryTask) {
-			yield cancel(currentQueryTask);
+			const _t = currentQueryTask;
 			currentQueryTask = null;
+			yield cancel(_t);
 		}
 	}
 	function* forkQueryTask(route, params, query) {

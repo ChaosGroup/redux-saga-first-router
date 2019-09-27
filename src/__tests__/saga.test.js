@@ -1,5 +1,5 @@
 import { take, put } from 'redux-saga/effects';
-import createHistory from 'history/createMemoryHistory';
+import { createMemoryHistory as createHistory } from 'history';
 
 import {
 	navigate,

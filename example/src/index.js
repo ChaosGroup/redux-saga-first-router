@@ -8,7 +8,7 @@ import { createStore, compose, applyMiddleware, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 import { put, call, cancelled, fork } from 'redux-saga/effects';
-import createHistory from 'history/createBrowserHistory';
+import { createBrowserHistory as createHistory } from 'history';
 
 import {
 	reducer as routerReducer,
