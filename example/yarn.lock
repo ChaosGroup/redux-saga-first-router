@@ -4843,7 +4843,7 @@ locate-path@^2.0.0:
     p-locate "^2.0.0"
     path-exists "^3.0.0"
 
-lodash._reinterpolate@~3.0.0:
+lodash._reinterpolate@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/lodash._reinterpolate/-/lodash._reinterpolate-3.0.0.tgz#0ccf2d89166af03b3663c796538b75ac6e114d9d"
   integrity sha1-DM8tiRZq8Ds2Y8eWU4t1rG4RTZ0=
@@ -4869,19 +4869,19 @@ lodash.memoize@^4.1.2:
   integrity sha1-vMbEmkKihA7Zl/Mj6tpezRguC/4=
 
 lodash.template@^4.4.0:
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/lodash.template/-/lodash.template-4.4.0.tgz#e73a0385c8355591746e020b99679c690e68fba0"
-  integrity sha1-5zoDhcg1VZF0bgILmWecaQ5o+6A=
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.template/-/lodash.template-4.5.0.tgz#f976195cf3f347d0d5f52483569fe8031ccce8ab"
+  integrity sha512-84vYFxIkmidUiFxidA/KjjH9pAycqW+h980j7Fuz5qxRtO9pgB7MDFTdys1N7A5mcucRiDyEq4fusljItR1T/A==
   dependencies:
-    lodash._reinterpolate "~3.0.0"
+    lodash._reinterpolate "^3.0.0"
     lodash.templatesettings "^4.0.0"
 
 lodash.templatesettings@^4.0.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/lodash.templatesettings/-/lodash.templatesettings-4.1.0.tgz#2b4d4e95ba440d915ff08bc899e4553666713316"
-  integrity sha1-K01OlbpEDZFf8IvImeRVNmZxMxY=
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/lodash.templatesettings/-/lodash.templatesettings-4.2.0.tgz#e481310f049d3cf6d47e912ad09313b154f0fb33"
+  integrity sha512-stgLz+i3Aa9mZgnjr/O+v9ruKZsPsndy7qPZOchbqk2cnTU1ZaldKK+v7m54WoKIyxiuMZTKT2H81F8BeAc3ZQ==
   dependencies:
-    lodash._reinterpolate "~3.0.0"
+    lodash._reinterpolate "^3.0.0"
 
 lodash.uniq@^4.5.0:
   version "4.5.0"
@@ -6583,20 +6583,15 @@ reduce-function-call@^1.0.1:
   dependencies:
     balanced-match "^0.4.2"
 
-redux-saga-first-router@^0.0.22:
-  version "0.0.22"
-  resolved "https://registry.yarnpkg.com/redux-saga-first-router/-/redux-saga-first-router-0.0.22.tgz#e351d8503bc1439c3fc7b17a692b34308d0ada8c"
-  integrity sha512-wqRIhhJfV/37YnLuPaaDDA4yAz6hYgJdZ7UNis9cWU2TrdgON1VJR23Fn5Wc9SZ508T9Xc9MnPIsTzWj2O7SXA==
+redux-saga-first-router@^1.0.1:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/redux-saga-first-router/-/redux-saga-first-router-1.0.2.tgz#35aff6f61b267135e5ad16a65f765f0af414dd37"
+  integrity sha512-oszzt3hRRt0UJNhpaSO9m/1UVEfJrbZ6HVzNtOTmzVQmjQ/OEeKYuQ99yPvuwtPF2rK2+xlq0QRlz3PZ4rHpbg==
   dependencies:
     "@babel/runtime" "^7.3.4"
     history "^4.7.2"
     path-to-regexp "^3.0.0"
-    redux-saga "0.16.0"
-
-redux-saga@0.16.0:
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/redux-saga/-/redux-saga-0.16.0.tgz#0a231db0a1489301dd980f6f2f88d8ced418f724"
-  integrity sha1-CiMdsKFIkwHdmA9vL4jYztQY9yQ=
+    redux-saga "^1.0.2"
 
 redux-saga@^1.0.2:
   version "1.0.2"
