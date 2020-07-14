@@ -1,16 +1,9 @@
 import { take, put } from 'redux-saga/effects';
 import { createMemoryHistory as createHistory } from 'history';
 
-import {
-	navigate,
-	NAVIGATE,
-	buildRoutesMap,
-	route,
-	createHistoryChannel,
-	historyToStore,
-	storeToHistory,
-	HISTORY_STAMP,
-} from '../index';
+import { navigate, NAVIGATE, buildRoutesMap, route } from '../core';
+
+import { createHistoryChannel, historyToStore, storeToHistory, HISTORY_STAMP } from '../saga';
 
 const jobNavigate = function* () {};
 const projectNavigate = function* () {};

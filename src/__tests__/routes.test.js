@@ -1,4 +1,4 @@
-import { buildRoutesMap, route } from '../index';
+import { buildRoutesMap, route } from '../core';
 
 describe('buildRoutesMap', () => {
 	const routes = [

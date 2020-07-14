@@ -1,4 +1,4 @@
-import { actionToPath, buildRoutesMap, route, navigate } from '../index';
+import { actionToPath, buildRoutesMap, route, navigate } from '../core';
 
 const routesMap = buildRoutesMap(
 	route('JOB', '/portal/projects/:projectName/:jobId'),
