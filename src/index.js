@@ -1,6 +1,6 @@
 import { eventChannel, buffers } from 'redux-saga';
 import { take, put, call, fork, cancel } from 'redux-saga/effects';
-import { pathToRegexp, compile } from 'path-to-regexp';
+import { compile as p2rCompile, match as p2rMatch } from 'path-to-regexp';
 
 export const NAVIGATE = 'router/NAVIGATE';
 
@@ -14,36 +14,33 @@ export function route(id, path, navigateSaga, querySaga) {
 
 export function buildRoutesMap(...routes) {
 	return new Map(
-		routes.map(route => {
-			const { id, path } = route;
-			const keys = [];
-			const re = pathToRegexp(path, keys);
-			const toPath = compile(path, { encode: encodeURIComponent });
-			return [id, { ...route, re, keys, toPath }];
-		})
+		routes.map(route => [
+			route.id,
+			{
+				...route,
+				match: p2rMatch(route.path, { decode: decodeURIComponent }),
+				toPath: p2rCompile(route.path, { encode: encodeURIComponent }),
+			},
+		])
 	);
 }
 
-const initialState = {
+const INITIAL_STATE = {
 	id: null,
 	params: null,
 	query: null,
 	prev: null,
 };
 
-export function reducer(state = initialState, action) {
-	if (action.type === NAVIGATE) {
-		return {
-			id: action.id,
-			params: action.params,
-			query: action.query,
-			prev: state.id && {
-				...state,
-				prev: null,
-			},
-		};
-	}
-	return state;
+export function reducer(state = INITIAL_STATE, action) {
+	return action.type === NAVIGATE
+		? {
+				id: action.id,
+				params: action.params,
+				query: action.query,
+				prev: state.id ? { ...state, prev: null } : null,
+		  }
+		: state;
 }
 
 // epoberezkin/fast-deep-equal
@@ -185,21 +182,10 @@ export function pathToAction(routesMap, path, search, state = {}) {
 	const opts = query && { query };
 
 	for (const [id, route] of routesMap.entries()) {
-		const captures = path.match(route.re);
-		if (!captures) {
-			continue;
+		const match = route.match(path);
+		if (match) {
+			return navigate(id, { ...match.params, ...state }, opts);
 		}
-
-		const params = captures.slice(1).reduce((params, capture, index) => {
-			const key = route.keys[index];
-			const value = typeof capture === 'string' ? decodeURIComponent(capture) : capture;
-
-			params[key.name] = value;
-
-			return params;
-		}, {});
-
-		return navigate(id, { ...params, ...state }, opts);
 	}
 
 	return navigate('NOT_FOUND');
