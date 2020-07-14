@@ -1,31 +1,47 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
-class ScreenA extends Component {
-	render() {
-		return <p>Hello from A screen</p>;
-	}
+function ScreenA() {
+	return <p>Hello from A screen</p>;
 }
 
-class ScreenB extends Component {
-	render() {
-		return <p>Hello from B screen</p>;
-	}
+function ScreenB({ timeStamp }) {
+	return <p>Hello from B screen, timeStamp: {timeStamp}</p>;
 }
 
-class ScreenC extends Component {
-	render() {
-		return <p>Hello from C screen</p>;
-	}
+function ScreenC({ opt }) {
+	return <p>Hello from C screen{opt ? `, opt: ${opt}` : ''}</p>;
 }
 
-class Screen extends Component {
+function ScreenError({ error }) {
+	return <p>Error: {error}</p>;
+}
+
+const ROUTE_SCREENS = {
+	A: ScreenA,
+	B: ScreenB,
+	C: ScreenC,
+};
+
+class Screen extends PureComponent {
+	state = { error: null };
+
 	render() {
-		const { routing: { id, params, query } } = this.props;
-		return ({
-			A: () => <ScreenA />,
-			B: () => <ScreenB {...params} />,
-			C: () => <ScreenC {...params} query={query} />,
-		}[id] || (() => null))();
+		const {
+			routing: { id, params, query },
+		} = this.props;
+		const { error } = this.state;
+
+		if (error) {
+			return <ScreenError error={error} />;
+		}
+
+		const Child = ROUTE_SCREENS[id] || null;
+
+		return Child && <Child {...{ ...params, query }} />;
+	}
+
+	static getDerivedStateFromError(error) {
+		return { error };
 	}
 }
 

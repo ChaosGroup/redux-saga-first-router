@@ -12,8 +12,8 @@ import {
 	HISTORY_STAMP,
 } from '../index';
 
-const jobNavigate = function*() {};
-const projectNavigate = function*() {};
+const jobNavigate = function* () {};
+const projectNavigate = function* () {};
 
 const routesMap = buildRoutesMap(
 	route('JOB', '/portal/projects/:projectName/:jobId', jobNavigate),
@@ -94,10 +94,9 @@ describe('storeToHistory', () => {
 
 		// history updated with PUSH
 		expect(history).toMatchObject({
-			// ? memory history removes URL encoding
-			location: { pathname: '/portal/projects/Project 123', search: '?returnTo=home' },
+			location: { pathname: '/portal/projects/Project%20123', search: '?returnTo=home' },
 			action: 'PUSH',
-			length: 2,
+			index: 1,
 		});
 	});
 
@@ -116,7 +115,7 @@ describe('storeToHistory', () => {
 		expect(history).toMatchObject({
 			location: { pathname: '/portal/projects' },
 			action: 'REPLACE',
-			length: 1,
+			index: 0,
 		});
 	});
 
@@ -131,6 +130,6 @@ describe('storeToHistory', () => {
 		expect(gen.next(navigate('UNKNOWN')).value).toEqual(take(NAVIGATE));
 
 		// history not updated
-		expect(history.length).toBe(1);
+		expect(history.index).toBe(0);
 	});
 });
