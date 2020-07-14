@@ -21,10 +21,8 @@ describe('buildRoutesMap', () => {
 		expect(projectRoute).toBeDefined();
 		expect(projectRoute).toHaveProperty('id', 'PROJECT');
 		expect(projectRoute).toHaveProperty('path', '/portal/projects/:projectName');
-		expect(projectRoute).toHaveProperty('re');
-		expect(projectRoute.re).toBeInstanceOf(RegExp);
-		expect(projectRoute).toHaveProperty('keys');
-		expect(projectRoute.keys).toBeInstanceOf(Array);
+		expect(projectRoute).toHaveProperty('match');
+		expect(projectRoute.match).toBeInstanceOf(Function);
 		expect(projectRoute).toHaveProperty('toPath');
 		expect(projectRoute.toPath).toBeInstanceOf(Function);
 		expect(projectRoute).toHaveProperty('navigateSaga');

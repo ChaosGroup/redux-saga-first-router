@@ -3,7 +3,8 @@ import { buildRoutesMap, route, navigate, pathToAction } from '../index';
 const routesMap = buildRoutesMap(
 	route('PROJECT', '/portal/projects/:projectName'),
 	route('PROJECTS', '/portal/projects'),
-	route('DOWNLOAD', '/portal/download')
+	route('DOWNLOAD', '/portal/download'),
+	route('MODEL', '/portal/model/:tags*')
 );
 
 describe('pathToAction', () => {
@@ -14,6 +15,14 @@ describe('pathToAction', () => {
 	test('defined route, with params', () => {
 		expect(pathToAction(routesMap, '/portal/projects/Project123')).toEqual(
 			navigate('PROJECT', { projectName: 'Project123' })
+		);
+	});
+
+	test('defined route, with zero or more params', () => {
+		expect(pathToAction(routesMap, '/portal/model')).toEqual(navigate('MODEL', {}));
+
+		expect(pathToAction(routesMap, '/portal/model/tag1/tag2/tag3')).toEqual(
+			navigate('MODEL', { tags: ['tag1', 'tag2', 'tag3'] })
 		);
 	});
 
