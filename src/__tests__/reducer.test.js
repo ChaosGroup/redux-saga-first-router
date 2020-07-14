@@ -1,4 +1,5 @@
-import { reducer, navigate } from '../index';
+import { navigate } from '../core';
+import { reducer } from '../reducer';
 
 describe('reducer', () => {
 	test('should return the initial state', () => {

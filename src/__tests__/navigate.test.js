@@ -1,4 +1,4 @@
-import { navigate, NAVIGATE } from '../index';
+import { navigate, NAVIGATE } from '../core';
 
 describe('navigate', () => {
 	test('should create NAVIGATE action', () => {
