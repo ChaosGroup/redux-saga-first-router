@@ -1,9 +1,12 @@
 {
 	"name": "redux-saga-first-router",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"description": "'Saga First' Router for React/Redux/Saga Projects",
-	"main": "lib/index.js",
-	"module": "lib/es/index.js",
+	"source": "src/index.js",
+	"main": "lib/redux-saga-first-router.js",
+	"module": "lib/redux-saga-first-router.module.js",
+	"esmodule": "lib/redux-saga-first-router.modern.js",
+	"unpkg": "lib/redux-saga-first-router.umd.js",
 	"repository": "https://github.com/ChaosGroup/redux-saga-first-router",
 	"author": "ChaosGroup (c) 2013-2017",
 	"license": "MIT",
@@ -18,35 +21,29 @@
 		"lib"
 	],
 	"devDependencies": {
-		"@babel/cli": "^7.6.2",
-		"@babel/core": "^7.6.2",
-		"@babel/plugin-transform-runtime": "^7.6.2",
-		"@babel/preset-env": "^7.6.2",
-		"babel-eslint": "^10.0.3",
-		"babel-jest": "^24.9.0",
-		"cross-env": "^6.0.0",
-		"eslint": "^6.4.0",
-		"eslint-plugin-jest": "^22.17.0",
-		"history": "^4.10.1",
-		"jest": "^24.9.0",
-		"npm-run-all": "^4.1.5",
-		"prettier": "^1.18.2",
-		"rimraf": "^3.0.0"
+		"babel-eslint": "^10.1.0",
+		"babel-jest": "^26.1.0",
+		"eslint": "^7.4.0",
+		"eslint-config-prettier": "^6.11.0",
+		"eslint-plugin-jest": "^23.18.0",
+		"jest": "^26.1.0",
+		"microbundle": "^0.12.2",
+		"prettier": "^2.0.5"
 	},
 	"dependencies": {
-		"@babel/runtime": "^7.6.2",
-		"path-to-regexp": "^3.1.0",
-		"redux-saga": "^1.1.1"
+		"@babel/runtime": "^7.10.4",
+		"history": "^5.0.0",
+		"path-to-regexp": "^6.1.0",
+		"redux-saga": "^1.1.3"
 	},
 	"scripts": {
-		"build": "run-s clean build:**",
-		"build:cjs": "cross-env BABEL_ENV=cjs babel src --out-dir lib --ignore __tests__",
-		"build:es": "cross-env BABEL_ENV=es babel src --out-dir lib/es --ignore __tests__",
-		"clean": "rimraf lib",
+		"build": "microbundle",
+		"dev": "microbundle watch",
 		"eslint": "eslint src",
 		"test": "jest",
 		"test-dev": "jest --watchAll",
-		"prettier": "prettier --write \"src/**/*.js\""
+		"prettier": "prettier --write \"src/**/*.js\"",
+		"prepare": "yarn run build"
 	},
 	"jest": {
 		"moduleNameMapper": {},

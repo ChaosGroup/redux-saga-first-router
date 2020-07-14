@@ -1,6 +1,6 @@
 import { eventChannel, buffers } from 'redux-saga';
 import { take, put, call, fork, cancel } from 'redux-saga/effects';
-import pathToRegexp from 'path-to-regexp';
+import { pathToRegexp, compile } from 'path-to-regexp';
 
 export const NAVIGATE = 'router/NAVIGATE';
 
@@ -18,7 +18,7 @@ export function buildRoutesMap(...routes) {
 			const { id, path } = route;
 			const keys = [];
 			const re = pathToRegexp(path, keys);
-			const toPath = pathToRegexp.compile(path);
+			const toPath = compile(path, { encode: encodeURIComponent });
 			return [id, { ...route, re, keys, toPath }];
 		})
 	);

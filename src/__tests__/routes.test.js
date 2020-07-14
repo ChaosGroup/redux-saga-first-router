@@ -3,8 +3,13 @@ import { buildRoutesMap, route } from '../index';
 describe('buildRoutesMap', () => {
 	const routes = [
 		route('JOB', '/portal/projects/:projectName/:jobId'),
-		route('PROJECT', '/portal/projects/:projectName', function*() {}, function*() {}),
-		route('PROJECTS', '/portal/projects', function*() {}),
+		route(
+			'PROJECT',
+			'/portal/projects/:projectName',
+			function* () {},
+			function* () {}
+		),
+		route('PROJECTS', '/portal/projects', function* () {}),
 		route('DOWNLOAD', '/portal/download'),
 	];
 
