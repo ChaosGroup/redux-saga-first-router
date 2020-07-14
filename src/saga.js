@@ -13,7 +13,7 @@ export function createHistoryChannel(history) {
 	return eventChannel(emitter => {
 		emitter({ location: history.location });
 
-		const stop = history.listen((location, action) => {
+		const stop = history.listen(({ location, action }) => {
 			emitter({ location, action });
 		});
 
@@ -97,6 +97,7 @@ export function* historyToStore(routesMap, historyChannel) {
 	while (true) {
 		const { location, action } = yield take(historyChannel);
 		if (!action || action === Action.Pop) {
+			console.log('opa', location);
 			const { pathname, search, state } = location;
 			const navigateAction = pathToAction(routesMap, pathname, search, state);
 			if (navigateAction) {
