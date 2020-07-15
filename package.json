@@ -1,6 +1,6 @@
 {
 	"name": "redux-saga-first-router",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"description": "'Saga First' Router for React/Redux/Saga Projects",
 	"source": "src/index.js",
 	"main": "lib/redux-saga-first-router.js",
