@@ -49,6 +49,21 @@ describe('pathToAction', () => {
 		);
 	});
 
+	test('defined route, with params, with search and repeating keys', () => {
+		expect(
+			pathToAction(routesMap, {
+				pathname: '/portal/projects/Project123',
+				search: '?returnTo=home&key1=1&key2=2&key1=3',
+			})
+		).toEqual(
+			navigate(
+				'PROJECT',
+				{ projectName: 'Project123' },
+				{ query: { returnTo: 'home', key1: ['1', '3'], key2: '2' } }
+			)
+		);
+	});
+
 	test('defined route, with params, without search', () => {
 		expect(
 			pathToAction(routesMap, {
