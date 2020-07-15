@@ -97,9 +97,7 @@ export function* historyToStore(routesMap, historyChannel) {
 	while (true) {
 		const { location, action } = yield take(historyChannel);
 		if (!action || action === Action.Pop) {
-			console.log('opa', location);
-			const { pathname, search, state } = location;
-			const navigateAction = pathToAction(routesMap, pathname, search, state);
+			const navigateAction = pathToAction(routesMap, location);
 			if (navigateAction) {
 				navigateAction[HISTORY_STAMP] = true;
 				yield put(navigateAction);
@@ -118,11 +116,10 @@ export function* storeToHistory(routesMap, history) {
 			if (!navigateAction[HISTORY_STAMP]) {
 				const navigatePath = actionToPath(routesMap, navigateAction);
 				if (navigatePath !== null) {
-					const hargs = [navigatePath, { ...navigateAction.params }];
 					if (navigateAction.replace) {
-						history.replace(...hargs);
+						history.replace(navigatePath);
 					} else {
-						history.push(...hargs);
+						history.push(navigatePath);
 					}
 				}
 			}

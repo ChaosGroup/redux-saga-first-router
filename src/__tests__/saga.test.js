@@ -87,7 +87,10 @@ describe('storeToHistory', () => {
 
 		// history updated with PUSH
 		expect(history).toMatchObject({
-			location: { pathname: '/portal/projects/Project%20123', search: '?returnTo=home' },
+			location: {
+				pathname: '/portal/projects/Project%20123',
+				search: '?returnTo=home',
+			},
 			action: 'PUSH',
 			index: 1,
 		});

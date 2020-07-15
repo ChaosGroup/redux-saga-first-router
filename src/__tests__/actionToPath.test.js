@@ -9,13 +9,19 @@ const routesMap = buildRoutesMap(
 
 describe('actionToPath', () => {
 	test('defined route, no params', () => {
-		expect(actionToPath(routesMap, navigate('PROJECTS'))).toBe('/portal/projects');
+		expect(actionToPath(routesMap, navigate('PROJECTS'))).toEqual({
+			pathname: '/portal/projects',
+			search: '',
+		});
 	});
 
 	test('defined route, with params', () => {
-		expect(actionToPath(routesMap, navigate('PROJECT', { projectName: 'Project 123' }))).toBe(
-			'/portal/projects/Project%20123'
-		);
+		expect(
+			actionToPath(routesMap, navigate('PROJECT', { projectName: 'Project 123' }))
+		).toEqual({
+			pathname: '/portal/projects/Project%20123',
+			search: '',
+		});
 	});
 
 	test('defined route, with missing params', () => {
@@ -30,7 +36,10 @@ describe('actionToPath', () => {
 				routesMap,
 				navigate('PROJECT', { projectName: 'Project 123' }, { query: { returnTo: 'home' } })
 			)
-		).toBe('/portal/projects/Project%20123?returnTo=home');
+		).toEqual({
+			pathname: '/portal/projects/Project%20123',
+			search: '?returnTo=home',
+		});
 	});
 
 	test('undefined route', () => {
