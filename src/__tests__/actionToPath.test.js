@@ -42,6 +42,22 @@ describe('actionToPath', () => {
 		});
 	});
 
+	test('defined route, with params and query and repeating keys', () => {
+		expect(
+			actionToPath(
+				routesMap,
+				navigate(
+					'PROJECT',
+					{ projectName: 'Project 123' },
+					{ query: { returnTo: 'home', key1: ['1', '3'], key2: '2' } }
+				)
+			)
+		).toEqual({
+			pathname: '/portal/projects/Project%20123',
+			search: '?key1=1&key1=3&key2=2&returnTo=home',
+		});
+	});
+
 	test('undefined route', () => {
 		expect(actionToPath(routesMap, navigate('UNDEFINED'))).toBe(null);
 	});

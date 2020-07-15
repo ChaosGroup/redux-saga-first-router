@@ -23,22 +23,53 @@ export function buildRoutesMap(...routes) {
 	);
 }
 
+function stringifyQuery(query) {
+	if (!query) {
+		return '';
+	}
+
+	const _query = new URLSearchParams();
+	for (const key in query) {
+		const val = query[key];
+		if (Array.isArray(val)) {
+			for (const _val of val) {
+				_query.append(key, _val);
+			}
+		} else {
+			_query.append(key, val);
+		}
+	}
+	_query.sort();
+	return `?${_query.toString()}`;
+}
+
 export function actionToPath(routesMap, action) {
 	const route = routesMap.get(action && action.id);
 	if (!route) {
 		return null;
 	}
 
-	const pathname = route.toPath(action.params) || '/';
-
-	const query = new URLSearchParams(action.query ?? {});
-	query.sort();
-	const search = Array.from(query.keys()).length ? `?${query.toString()}` : '';
-
-	return { pathname, search };
+	return {
+		pathname: route.toPath(action.params) || '/',
+		search: stringifyQuery(action.query),
+	};
 }
 
 export const NOT_FOUND = 'NOT_FOUND';
+
+function parseSearch(search) {
+	let query = null;
+	const _query = new URLSearchParams(search ?? '');
+	_query.sort();
+	for (const key of _query.keys()) {
+		if (!query) {
+			query = {};
+		}
+		const val = _query.getAll(key);
+		query[key] = val.length > 1 ? val : val[0];
+	}
+	return query;
+}
 
 export function pathToAction(routesMap, location) {
 	const { pathname, search } = location ?? {};
@@ -47,17 +78,10 @@ export function pathToAction(routesMap, location) {
 		return null;
 	}
 
-	for (const [id, route] of routesMap.entries()) {
+	for (const [id, route] of routesMap) {
 		const match = route.match(pathname);
 		if (match) {
-			const query = new URLSearchParams(search ?? '');
-			query.sort();
-
-			return navigate(
-				id,
-				{ ...match.params },
-				{ query: Array.from(query.keys()).length ? Object.fromEntries(query) : null }
-			);
+			return navigate(id, { ...match.params }, { query: parseSearch(search) });
 		}
 	}
 
