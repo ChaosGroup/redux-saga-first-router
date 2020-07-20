@@ -52,6 +52,7 @@ export function actionToPath(routesMap, action) {
 	return {
 		pathname: route.toPath(action.params) || '/',
 		search: stringifyQuery(action.query),
+		hash: '',
 	};
 }
 
@@ -71,8 +72,8 @@ function parseSearch(search) {
 	return query;
 }
 
-export function pathToAction(routesMap, location) {
-	const { pathname, search } = location ?? {};
+export function pathToAction(routesMap, path) {
+	const { pathname, search } = path ?? {};
 
 	if (typeof pathname !== 'string') {
 		return null;
