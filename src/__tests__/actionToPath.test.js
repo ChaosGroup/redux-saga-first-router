@@ -12,6 +12,7 @@ describe('actionToPath', () => {
 		expect(actionToPath(routesMap, navigate('PROJECTS'))).toEqual({
 			pathname: '/portal/projects',
 			search: '',
+			hash: ''
 		});
 	});
 
@@ -21,6 +22,7 @@ describe('actionToPath', () => {
 		).toEqual({
 			pathname: '/portal/projects/Project%20123',
 			search: '',
+			hash: ''
 		});
 	});
 
@@ -39,6 +41,7 @@ describe('actionToPath', () => {
 		).toEqual({
 			pathname: '/portal/projects/Project%20123',
 			search: '?returnTo=home',
+			hash: ''
 		});
 	});
 
@@ -55,6 +58,7 @@ describe('actionToPath', () => {
 		).toEqual({
 			pathname: '/portal/projects/Project%20123',
 			search: '?key1=1&key1=3&key2=2&returnTo=home',
+			hash: ''
 		});
 	});
 
