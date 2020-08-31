@@ -3,7 +3,7 @@ import { compile as p2rCompile, match as p2rMatch } from 'path-to-regexp';
 export const NAVIGATE = 'router/NAVIGATE';
 
 export function navigate(id, params = {}, opts = {}) {
-	return { type: NAVIGATE, id, params, query: null, ...opts };
+	return { type: NAVIGATE, id, params, query: null, hash: null, ...opts };
 }
 
 export function route(id, path, navigateSaga, querySaga) {
@@ -28,19 +28,21 @@ function stringifyQuery(query) {
 		return '';
 	}
 
-	const _query = new URLSearchParams();
+	const params = new URLSearchParams();
 	for (const key in query) {
 		const val = query[key];
 		if (Array.isArray(val)) {
 			for (const _val of val) {
-				_query.append(key, _val);
+				params.append(key, _val);
 			}
 		} else {
-			_query.append(key, val);
+			params.append(key, val);
 		}
 	}
-	_query.sort();
-	return `?${_query.toString()}`;
+	params.sort();
+
+	const _query = params.toString();
+	return _query ? `?${_query}` : '';
 }
 
 export function actionToPath(routesMap, action) {
@@ -52,7 +54,7 @@ export function actionToPath(routesMap, action) {
 	return {
 		pathname: route.toPath(action.params) || '/',
 		search: stringifyQuery(action.query),
-		hash: '',
+		hash: action.hash ? `#${action.hash}` : '',
 	};
 }
 
@@ -73,7 +75,7 @@ function parseSearch(search) {
 }
 
 export function pathToAction(routesMap, path) {
-	const { pathname, search } = path ?? {};
+	const { pathname, search, hash } = path ?? {};
 
 	if (typeof pathname !== 'string') {
 		return null;
@@ -82,7 +84,11 @@ export function pathToAction(routesMap, path) {
 	for (const [id, route] of routesMap) {
 		const match = route.match(pathname);
 		if (match) {
-			return navigate(id, { ...match.params }, { query: parseSearch(search) });
+			return navigate(
+				id,
+				{ ...match.params },
+				{ query: parseSearch(search), hash: hash ?? null }
+			);
 		}
 	}
 

@@ -49,6 +49,22 @@ describe('pathToAction', () => {
 		);
 	});
 
+	test('defined route, with params, with search and hash', () => {
+		expect(
+			pathToAction(routesMap, {
+				pathname: '/portal/projects/Project123',
+				search: '?returnTo=home',
+				hash: 'hello',
+			})
+		).toEqual(
+			navigate(
+				'PROJECT',
+				{ projectName: 'Project123' },
+				{ query: { returnTo: 'home' }, hash: 'hello' }
+			)
+		);
+	});
+
 	test('defined route, with params, with search and repeating keys', () => {
 		expect(
 			pathToAction(routesMap, {
