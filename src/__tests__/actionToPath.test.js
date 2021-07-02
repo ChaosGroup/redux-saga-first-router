@@ -36,7 +36,8 @@ describe('actionToPath', () => {
 		expect(
 			actionToPath(
 				routesMap,
-				navigate('PROJECT', { projectName: 'Project 123' }, { query: { returnTo: 'home' } })
+				navigate('PROJECT', { projectName: 'Project 123' },
+					{ query: { returnTo: 'home', missing: undefined, unspecified: null } })
 			)
 		).toEqual({
 			pathname: '/portal/projects/Project%20123',

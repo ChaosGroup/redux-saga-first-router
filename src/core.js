@@ -31,6 +31,9 @@ function stringifyQuery(query) {
 	const params = new URLSearchParams();
 	for (const key in query) {
 		const val = query[key];
+		if (val === undefined || val === null) {
+			continue;
+		}
 		if (Array.isArray(val)) {
 			for (const _val of val) {
 				params.append(key, _val);
